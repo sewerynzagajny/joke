@@ -1,0 +1,110 @@
+@import url("https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Luckiest+Guy&display=swap");
+
+// FONT VARIABLES
+$font-primary: "Bubblegum Sans", sans-serif;
+$font-headline: "Luckiest Guy", cursive;
+$font-size-primary: 2.4rem;
+$font-weight-primary: 400;
+
+// COLLORS
+$font-color-primary: #002366;
+$font-color-secondary: #5c4033;
+
+$background-color-primary: #fcc419;
+
+//Animation
+@keyframes grow {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes head {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1) rotate(-8deg);
+    opacity: 1;
+  }
+}
+
+///Querias
+
+///////////////////////////////////////////////////////////////////
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-size: $font-size-primary;
+  font-family: $font-primary;
+  color: $font-color-secondary;
+  font-weight: $font-weight-primary;
+  background-color: $background-color-primary;
+  // letter-spacing: $letter-spacing;
+}
+
+//////////////////////////////////////////////////////////////////
+///
+.app {
+  max-width: 120rem;
+  margin: 0 auto;
+  height: 100vh;
+}
+
+////////////////////////////////////////////////////////////////////
+///
+
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 2rem 0;
+
+  &__img {
+    height: 18.8rem;
+    animation: grow 1.5s ease-in-out;
+  }
+
+  &__heading-primary {
+    text-align: center;
+    font-family: $font-headline;
+    letter-spacing: 4px;
+    animation: head 1.5s ease-in-out;
+    transform: rotate(-8deg);
+  }
+}
+
+///////////////////////////////////////////////////////////////////////
+
+.joking-text {
+  text-align: center;
+  padding: 2rem 0;
+}
