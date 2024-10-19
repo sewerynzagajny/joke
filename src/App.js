@@ -8,27 +8,31 @@ const language = [
 function Button({ onClick, children }) {
   return (
     <button className="btn" onClick={onClick}>
-      {children}
+      <span className="btn__text">{children}</span>
     </button>
   );
 }
 
 export default function App() {
+  const [select, setStelect] = useState("pl");
+
   return (
     <div className="app">
-      <Logo />
+      <Logo select={select} />
       <JokingText />
-      <Cta />
+      <Cta select={select} setStelect={setStelect} />
       <Footer />
     </div>
   );
 }
 
-function Logo() {
+function Logo({ select }) {
   return (
     <div className="logo">
       <img className="logo__img" src="/logo.png" alt="logo" />
-      <h1 className="logo__heading-primary"> Ale jaja!!</h1>
+      <h1 className="logo__heading-primary">
+        {select === "pl" ? "Ale jaja!!" : "Cracking Up!!"}{" "}
+      </h1>
     </div>
   );
 }
@@ -46,25 +50,26 @@ function JokingText() {
   );
 }
 
-function Cta() {
-  const [select, setStelect] = useState("pl");
+function Cta({ select, setStelect }) {
   return (
     <div className="cta">
       <Button>{select === "pl" ? "Żart" : "Joke"}</Button>
-      <select
-        className="cta__select"
-        value={select}
-        onChange={(e) => setStelect(e.target.value)}
-      >
-        <option value="" disabled selected>
-          {select === "pl" ? "Wybierz język" : "Select language"}
-        </option>
-        {language.map((el) => (
-          <option key={el.id} value={el.value}>
-            {select === "pl" ? el.descriptionPl : el.descriptionEN}
+      <form>
+        <select
+          className="cta__select"
+          value={select}
+          onChange={(e) => setStelect(e.target.value)}
+        >
+          <option value="" disabled>
+            {select === "pl" ? "Wybierz język" : "Select language"}
           </option>
-        ))}
-      </select>
+          {language.map((el) => (
+            <option key={el.id} value={el.value}>
+              {select === "pl" ? el.descriptionPl : el.descriptionEN}
+            </option>
+          ))}
+        </select>
+      </form>
     </div>
   );
 }

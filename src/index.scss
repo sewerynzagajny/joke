@@ -12,6 +12,9 @@ $font-color-primary: #002366;
 $font-color-secondary: #5c4033;
 
 $background-color-primary: #fcc419;
+$background-color-btn: #ffec99;
+$background-color-btn-hover: #fab005;
+$color-black: #000;
 
 //Animation
 @keyframes grow {
@@ -48,6 +51,17 @@ $background-color-primary: #fcc419;
   }
 }
 
+@keyframes moveInBotton {
+  0% {
+    opacity: 0;
+    transform: translateY(3rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0);
+  }
+}
+
 ///Querias
 
 ///////////////////////////////////////////////////////////////////
@@ -70,6 +84,22 @@ body {
   // letter-spacing: $letter-spacing;
 }
 
+///////////////////////////////////////////////////////////////////////
+%common-input-styles {
+  background-color: $background-color-btn;
+  border: solid $background-color-btn 0.2rem;
+  box-shadow: 0 1rem 2rem rgba($color-black, 0.15);
+  border-radius: 1rem;
+  text-decoration: none;
+  font-family: inherit;
+  color: $color-black;
+  font-size: 1.8rem;
+  cursor: pointer;
+  animation: moveInBotton 0.5s ease-out 1.5s;
+  animation-fill-mode: backwards;
+  transition: all 0.3s;
+}
+
 //////////////////////////////////////////////////////////////////
 ///
 .app {
@@ -80,6 +110,33 @@ body {
 
 ////////////////////////////////////////////////////////////////////
 ///
+.btn {
+  @extend %common-input-styles;
+
+  padding: 0.8rem 6rem;
+  height: 4.2rem;
+
+  &__text {
+    display: inline-block;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover {
+    background-color: $background-color-btn-hover;
+  }
+
+  &:hover &__text {
+    transform: scaleX(-1);
+  }
+
+  &:active {
+    background-color: $background-color-btn-hover;
+    box-shadow: 0 0.5rem 1rem rgba($color-black, 0.2);
+    transform: translateY(0.25rem);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
 
 .logo {
   display: flex;
@@ -113,9 +170,20 @@ body {
 
 .cta {
   display: flex;
-  gap: 2rem;
+  gap: 4rem;
   justify-content: center;
   align-items: center;
+
+  &__select {
+    @extend %common-input-styles;
+
+    padding: 0.8rem 1.6rem;
+
+    &:hover,
+    &:active {
+      background-color: $background-color-btn-hover;
+    }
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////
