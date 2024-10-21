@@ -119,10 +119,9 @@ export default function App() {
         return;
       }
       setIdCounter((prev) => prev + 1);
-
-      if (select === "en") setJoke({ jokeText: jokeText, id: idCounter });
-      else if (select === "pl")
-        await getTranslationFromAPI(jokeText, idCounter);
+      const jokeEn = { jokeTextEn: jokeText, jokeTextPl: "", id: idCounter };
+      setJoke(jokeEn);
+      await getTranslationFromAPI(jokeText, idCounter);
     } catch (err) {
       console.error(`${err} ❌❌❌`);
       throw err;
@@ -144,7 +143,10 @@ export default function App() {
       const data = await AJAX(apiURL, payload, apiName, apiKey);
       console.log("Translation response:", data);
       const translateText = data.translations[0].text;
-      setJoke({ jokeText: translateText, id });
+      setJoke((prevJoke) => ({
+        ...prevJoke,
+        jokeTextPl: translateText,
+      }));
       console.log(joke);
     } catch (err) {
       console.error(`${err} ❌❌❌`);
@@ -155,7 +157,7 @@ export default function App() {
   return (
     <div className="app">
       <Logo select={select} />
-      <JokingText joke={joke} />
+      <JokingText joke={joke} select={select} />
       <Cta
         select={select}
         setSelect={setSelect}
@@ -178,12 +180,11 @@ function Logo({ select }) {
   );
 }
 
-function JokingText({ joke }) {
-  // if (!jokes || !jokes.type) return;
+function JokingText({ joke, select }) {
   return (
     <div className="joking-text">
       <div key={joke.id} className="joke">
-        <p>{joke.jokeText}</p>
+        <p>{select === "pl" ? joke.jokeTextPl : joke.jokeTextEn}</p>
       </div>
     </div>
   );
