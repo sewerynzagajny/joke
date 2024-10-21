@@ -18,8 +18,6 @@ const limitMessages = [
   { id: 14, type: "single", joke: "Wróć jutro!" },
 ];
 
-const apiURL = "https://v2.jokeapi.dev/joke/Any";
-
 function Timeout(s) {
   return new Promise(function (_, reject) {
     setTimeout(function () {
@@ -28,17 +26,34 @@ function Timeout(s) {
   });
 }
 
-async function AJAX(url, uploadData = undefined) {
+async function AJAX(
+  url,
+  uploadData = undefined,
+  KeyName = undefined,
+  authKey = undefined,
+  contentType = "application/json"
+) {
   try {
-    const fetchPro = uploadData
-      ? fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(uploadData),
-        })
-      : fetch(url);
+    const headers = { "Content-Type": contentType };
+
+    if (authKey) {
+      headers["Authorization"] = `${KeyName} ${authKey}`;
+    }
+
+    let body;
+    if (uploadData) {
+      if (contentType === "application/json") {
+        body = JSON.stringify(uploadData);
+      } else if (contentType === "application/x-www-form-urlencoded") {
+        body = new URLSearchParams(uploadData).toString();
+      }
+    }
+
+    const fetchPro = fetch(url, {
+      method: uploadData ? "POST" : "GET",
+      headers: headers,
+      body: body,
+    });
 
     const res = await Promise.race([fetchPro, Timeout(10)]);
     const data = await res.json();
@@ -46,6 +61,7 @@ async function AJAX(url, uploadData = undefined) {
     if (!res.ok) throw new Error(`${data.message} ${res.status}`);
     return data;
   } catch (err) {
+    console.error("Error in AJAX function:", err);
     throw err;
   }
 }
@@ -76,11 +92,13 @@ export default function App() {
   //   console.log("Updated jokes:", jokes);
   // }, [jokes]);
 
-  function handleGetData() {
-    getDataFromAPI();
+  function handleGetJoke() {
+    getJokeFromAPI();
+    // getTranslationFromAPI();
   }
 
-  async function getDataFromAPI() {
+  async function getJokeFromAPI() {
+    const apiURL = "https://v2.jokeapi.dev/joke/Any";
     try {
       if (idCounter >= 10 && idCounter < 15) {
         setIdCounter((prev) => prev + 1);
@@ -94,8 +112,39 @@ export default function App() {
       }
 
       const data = await AJAX(apiURL);
+      const jokeText = data.joke || `${data.setup} ${data.delivery}`;
+
+      if (!jokeText) {
+        console.error("No joke text returned from API.");
+        return;
+      }
       setIdCounter((prev) => prev + 1);
-      setJoke({ ...data, id: idCounter });
+
+      if (select === "en") setJoke({ jokeTextEn: jokeText, id: idCounter });
+      else if (select === "pl")
+        await getTranslationFromAPI(jokeText, idCounter);
+    } catch (err) {
+      console.error(`${err} ❌❌❌`);
+      throw err;
+    }
+  }
+
+  async function getTranslationFromAPI(jokeText, id) {
+    // const apiURL = "https://api-free.deepl.com/v2/translate";
+    const apiURL =
+      "https://cors-anywhere.herokuapp.com/https://api-free.deepl.com/v2/translate";
+    const apiKey = "5d248dcc-0af5-4df1-9f03-afbd7e480113:fx";
+    const apiName = "DeepL-Auth-Key";
+    const payload = {
+      text: [jokeText],
+      source_lang: "EN",
+      target_lang: "PL",
+    };
+    try {
+      const data = await AJAX(apiURL, payload, apiName, apiKey);
+      console.log("Translation response:", data);
+      const translateText = data.translations[0].text;
+      setJoke({ jokeTextPl: translateText, id });
       console.log(joke);
     } catch (err) {
       console.error(`${err} ❌❌❌`);
@@ -107,7 +156,12 @@ export default function App() {
     <div className="app">
       <Logo select={select} />
       <JokingText joke={joke} />
-      <Cta select={select} setSelect={setSelect} onGetData={handleGetData} />
+      <Cta
+        select={select}
+        setSelect={setSelect}
+        onGetJoke={handleGetJoke}
+        idCounter={idCounter}
+      />
       <Footer />
     </div>
   );
@@ -129,22 +183,21 @@ function JokingText({ joke }) {
   return (
     <div className="joking-text">
       <div key={joke.id} className="joke">
-        {joke.type === "single" && <p>{joke.joke}</p>}
-        {joke.type === "twopart" && (
-          <>
-            <p>{joke.setup}</p>
-            <p>{joke.delivery}</p>
-          </>
-        )}
+        <p>{joke.jokeTextEn}</p>
+        <p>{joke.jokeTextPl}</p>
       </div>
     </div>
   );
 }
 
-function Cta({ select, setSelect, onGetData }) {
+function Cta({ select, setSelect, onGetJoke, idCounter }) {
   return (
     <div className="cta">
-      <Button onClick={onGetData}>{select === "pl" ? "Żart" : "Joke"}</Button>
+      <Button onClick={onGetJoke}>
+        {select === "pl" ? "Żart" : "Joke"}{" "}
+        {(idCounter > 0 && idCounter <= 10 && `(${10 - idCounter})`) ||
+          (idCounter > 10 && `(${0})`)}
+      </Button>
       <form>
         <select
           className="cta__select"

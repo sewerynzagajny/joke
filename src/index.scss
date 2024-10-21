@@ -113,8 +113,9 @@ body {
 .btn {
   @extend %common-input-styles;
 
-  padding: 0.8rem 6rem;
+  padding: 0.8rem 0;
   height: 4.2rem;
+  width: 16.4rem;
 
   &__text {
     display: inline-block;
