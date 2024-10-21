@@ -7,15 +7,15 @@ const language = [
 ];
 
 const limitMessages = [
-  { id: 10, type: "single", joke: "Został osiągnięty dzienny limit" },
+  { id: 10, type: "single", jokeText: "Został osiągnięty dzienny limit" },
   {
     id: 11,
     type: "single",
-    joke: "Niestety musisz samodzielnie wymyśleć żart",
+    jokeText: "Niestety musisz samodzielnie wymyśleć żart",
   },
-  { id: 12, type: "single", joke: "Nie klikaj. Nic to nie da. Wróć jutro" },
-  { id: 13, type: "single", joke: "Serio wróc jutro! Starczy na dziś" },
-  { id: 14, type: "single", joke: "Wróć jutro!" },
+  { id: 12, type: "single", jokeText: "Nie klikaj. Nic to nie da. Wróć jutro" },
+  { id: 13, type: "single", jokeText: "Serio wróc jutro! Starczy na dziś" },
+  { id: 14, type: "single", jokeText: "Wróć jutro!" },
 ];
 
 function Timeout(s) {
@@ -120,7 +120,7 @@ export default function App() {
       }
       setIdCounter((prev) => prev + 1);
 
-      if (select === "en") setJoke({ jokeTextEn: jokeText, id: idCounter });
+      if (select === "en") setJoke({ jokeText: jokeText, id: idCounter });
       else if (select === "pl")
         await getTranslationFromAPI(jokeText, idCounter);
     } catch (err) {
@@ -144,7 +144,7 @@ export default function App() {
       const data = await AJAX(apiURL, payload, apiName, apiKey);
       console.log("Translation response:", data);
       const translateText = data.translations[0].text;
-      setJoke({ jokeTextPl: translateText, id });
+      setJoke({ jokeText: translateText, id });
       console.log(joke);
     } catch (err) {
       console.error(`${err} ❌❌❌`);
@@ -183,8 +183,7 @@ function JokingText({ joke }) {
   return (
     <div className="joking-text">
       <div key={joke.id} className="joke">
-        <p>{joke.jokeTextEn}</p>
-        <p>{joke.jokeTextPl}</p>
+        <p>{joke.jokeText}</p>
       </div>
     </div>
   );
