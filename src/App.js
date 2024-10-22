@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useEffect } from "react";
+import { useCallback } from "react";
 
 const language = [
   { id: 0, value: "pl", descriptionPl: "Polski", descriptionEN: "Polish" },
@@ -7,15 +8,31 @@ const language = [
 ];
 
 const limitMessages = [
-  { id: 10, type: "single", jokeText: "Został osiągnięty dzienny limit" },
+  {
+    id: 10,
+    jokeTextEn: "Daily limit has been reached. Try tomorrow 😉",
+    jokeTextPl: "Został osiągnięty dzienny limit. Spróbuj jutro 😉",
+  },
   {
     id: 11,
-    type: "single",
-    jokeText: "Niestety musisz samodzielnie wymyśleć żart",
+    jokeTextEn: "Unfortunately, you have to come up with the joke yourself 😅",
+    jokeTextPl: "Niestety, musisz samodzielnie wymyślić żart 😅",
   },
-  { id: 12, type: "single", jokeText: "Nie klikaj. Nic to nie da. Wróć jutro" },
-  { id: 13, type: "single", jokeText: "Serio wróc jutro! Starczy na dziś" },
-  { id: 14, type: "single", jokeText: "Wróć jutro!" },
+  {
+    id: 12,
+    jokeTextEn: "Don't click. It won't do anything. Come back tomorrow 😂",
+    jokeTextPl: "Nie klikaj. Nic to nie da. Wróć jutro 😂",
+  },
+  {
+    id: 13,
+    jokeTextEn: "Seriously, come back tomorrow. Enough for today 😎",
+    jokeTextPl: "Serio wróc jutro. Starczy na dziś 😎",
+  },
+  {
+    id: 14,
+    jokeTextEn: "Come back tomorrow 🙂",
+    jokeTextPl: "Wróć jutro 🙂",
+  },
 ];
 
 function Timeout(s) {
@@ -80,17 +97,62 @@ export default function App() {
     return savedSelect ? savedSelect : "pl"; // Fallback na "pl"
   });
 
-  const [joke, setJoke] = useState({});
-  const [idCounter, setIdCounter] = useState(0);
+  const [joke, setJoke] = useState(() => {
+    const savedJoke = localStorage.getItem("joke");
+    return savedJoke
+      ? JSON.parse(savedJoke)
+      : { jokeTextEn: "", jokeTextPl: "", id: 0 };
+  });
+
+  const [idCounter, setIdCounter] = useState(() => {
+    const savedCounter = localStorage.getItem("idCounter");
+    return savedCounter ? parseInt(savedCounter, 10) : 0;
+  });
+
+  const [translatedJokes, setTranslatedJokes] = useState(() => {
+    const savedTranslations = localStorage.getItem("translatedJokes");
+    return savedTranslations ? JSON.parse(savedTranslations) : {};
+  });
 
   useEffect(() => {
     localStorage.setItem("select", select);
   }, [select]);
 
-  // useEffect(() => {
-  //   // Logowanie aktualnego stanu żartów po każdej aktualizacji
-  //   console.log("Updated jokes:", jokes);
-  // }, [jokes]);
+  useEffect(() => {
+    if (joke && joke.jokeTextEn) {
+      localStorage.setItem("joke", JSON.stringify(joke));
+      localStorage.setItem("idCounter", idCounter);
+      localStorage.setItem("translatedJokes", JSON.stringify(translatedJokes));
+    }
+  }, [joke, idCounter, translatedJokes]);
+
+  function checkDate() {
+    let savedDateTomorrow = localStorage.getItem("dateTomorrow");
+
+    if (!savedDateTomorrow) {
+      let today = new Date();
+      let tomorrow = new Date();
+      tomorrow.setDate(today.getDate() + 1);
+      localStorage.setItem("dateTomorrow", tomorrow.toISOString());
+    } else {
+      let presentDate = new Date();
+      let dateTomorrow = new Date(savedDateTomorrow);
+
+      if (
+        presentDate.getDate() === dateTomorrow.getDate() &&
+        presentDate.getMonth() === dateTomorrow.getMonth() &&
+        presentDate.getFullYear() === dateTomorrow.getFullYear()
+      ) {
+        setIdCounter(0);
+        setJoke({ jokeTextEn: "", jokeTextPl: "", id: 0 });
+        localStorage.removeItem("joke");
+        localStorage.removeItem("idCounter");
+        localStorage.removeItem("dateTomorrow");
+      }
+    }
+  }
+
+  checkDate();
 
   function handleGetJoke() {
     getJokeFromAPI();
@@ -121,38 +183,75 @@ export default function App() {
       setIdCounter((prev) => prev + 1);
       const jokeEn = { jokeTextEn: jokeText, jokeTextPl: "", id: idCounter };
       setJoke(jokeEn);
-      await getTranslationFromAPI(jokeText, idCounter);
+
+      localStorage.setItem("joke", JSON.stringify(jokeEn));
+      localStorage.setItem("idCounter", idCounter + 1);
+
+      // await getTranslationFromAPI(jokeText);
     } catch (err) {
       console.error(`${err} ❌❌❌`);
       throw err;
     }
   }
 
-  async function getTranslationFromAPI(jokeText, id) {
-    // const apiURL = "https://api-free.deepl.com/v2/translate";
-    const apiURL =
-      "https://cors-anywhere.herokuapp.com/https://api-free.deepl.com/v2/translate";
-    const apiKey = "5d248dcc-0af5-4df1-9f03-afbd7e480113:fx";
-    const apiName = "DeepL-Auth-Key";
-    const payload = {
-      text: [jokeText],
-      source_lang: "EN",
-      target_lang: "PL",
-    };
-    try {
-      const data = await AJAX(apiURL, payload, apiName, apiKey);
-      console.log("Translation response:", data);
-      const translateText = data.translations[0].text;
-      setJoke((prevJoke) => ({
-        ...prevJoke,
-        jokeTextPl: translateText,
-      }));
-      console.log(joke);
-    } catch (err) {
-      console.error(`${err} ❌❌❌`);
-      throw err;
+  const getTranslationFromAPI = useCallback(
+    async (jokeText) => {
+      const apiURL =
+        "https://cors-anywhere.herokuapp.com/https://api-free.deepl.com/v2/translate";
+      const apiKey = "5d248dcc-0af5-4df1-9f03-afbd7e480113:fx";
+      const apiName = "DeepL-Auth-Key";
+      const payload = {
+        text: [jokeText],
+        source_lang: "EN",
+        target_lang: "PL",
+      };
+      try {
+        const data = await AJAX(apiURL, payload, apiName, apiKey);
+        console.log("Translation response:", data);
+        const translateText = data.translations[0].text;
+
+        setTranslatedJokes((prev) => ({
+          ...prev,
+          [jokeText]: translateText,
+        }));
+        setJoke((prevJoke) => ({
+          ...prevJoke,
+          jokeTextPl: translateText,
+        }));
+
+        localStorage.setItem(
+          "translatedJokes",
+          JSON.stringify({
+            ...translatedJokes,
+            [jokeText]: translateText,
+          })
+        );
+      } catch (err) {
+        console.error(`${err} ❌❌❌`);
+        throw err;
+      }
+    },
+    [translatedJokes]
+  );
+
+  useEffect(() => {
+    if (select === "pl" && joke.jokeTextEn && !joke.jokeTextPl) {
+      if (translatedJokes[joke.jokeTextEn]) {
+        setJoke((prevJoke) => ({
+          ...prevJoke,
+          jokeTextPl: translatedJokes[joke.jokeTextEn],
+        }));
+      } else {
+        getTranslationFromAPI(joke.jokeTextEn);
+      }
     }
-  }
+  }, [
+    select,
+    joke.jokeTextEn,
+    joke.jokeTextPl,
+    translatedJokes,
+    getTranslationFromAPI,
+  ]);
 
   return (
     <div className="app">
