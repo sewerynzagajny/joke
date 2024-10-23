@@ -328,7 +328,9 @@ function JokingText({ joke, select, loading }) {
         {loading ? (
           <Spinner />
         ) : (
-          <p>{select === "pl" ? joke.jokeTextPl : joke.jokeTextEn}</p>
+          <p className="joking-text__text">
+            {select === "pl" ? joke.jokeTextPl : joke.jokeTextEn}
+          </p>
         )}
       </div>
     </div>

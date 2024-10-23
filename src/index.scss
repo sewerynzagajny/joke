@@ -16,6 +16,12 @@ $background-color-btn: #ffec99;
 $background-color-btn-hover: #fab005;
 $color-black: #000;
 
+///Querias
+$bp-medium: 29em; //464px
+$bp-small: 27em; //432px
+$bp-smaller: 25em; //400px
+$bp-smallest: 23em; //368px
+
 //Animation
 @keyframes grow {
   0% {
@@ -83,6 +89,18 @@ $color-black: #000;
 
 html {
   font-size: 62.5%;
+
+  @media only screen and (max-width: $bp-medium) {
+    font-size: 56%;
+  }
+
+  @media only screen and (max-width: $bp-small) {
+    font-size: 50%;
+  }
+
+  @media only screen and (max-width: $bp-smaller) {
+    font-size: 45%;
+  }
 }
 
 body {
@@ -115,7 +133,7 @@ body {
 .app {
   max-width: 120rem;
   margin: 0 auto;
-  // height: 100vh;
+  height: 100vh;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -160,6 +178,10 @@ body {
   &__img {
     height: 18.8rem;
     animation: grow 1.5s ease-in-out;
+
+    @media only screen and (max-width: $bp-smallest) {
+      height: 16.8rem;
+    }
   }
 
   &__heading-primary {
@@ -168,6 +190,9 @@ body {
     letter-spacing: 4px;
     animation: head 1.5s ease-in-out;
     transform: rotate(-8deg);
+    @media only screen and (max-width: $bp-smallest) {
+      font-size: 3.6rem;
+    }
   }
 }
 
@@ -175,8 +200,17 @@ body {
 
 .joking-text {
   text-align: center;
-  padding: 2rem 0;
+  padding: 2rem 4rem;
   height: 20rem;
+  display: flex;
+  flex-direction: column;
+
+  &__text {
+    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: auto;
+    flex: 1;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////
