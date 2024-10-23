@@ -131,6 +131,8 @@ body {
 //////////////////////////////////////////////////////////////////
 ///
 .app {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
   max-width: 120rem;
   margin: 0 auto;
   height: 100vh;
@@ -192,6 +194,7 @@ body {
   }
 
   &__heading-primary {
+    margin-top: 2rem;
     text-align: center;
     font-family: $font-headline;
     letter-spacing: 4px;
@@ -208,15 +211,15 @@ body {
 .joking-text {
   text-align: center;
   padding: 2rem 4rem;
-  height: 20rem;
+  // height: 20rem;
   display: flex;
   flex-direction: column;
+  flex: 1;
 
   &__text {
     overflow: scroll;
     overflow-x: hidden;
     overflow-y: auto;
-    flex: 1;
   }
 }
 
@@ -232,8 +235,15 @@ body {
     @extend %common-input-styles;
 
     padding: 0.8rem 1.6rem;
+    height: 4.2rem;
 
-    &:hover,
+    &:hover {
+      background-color: $background-color-btn-hover;
+
+      @media (hover: none) and (pointer: coarse) {
+        background-color: $background-color-btn;
+      }
+    }
     &:active {
       background-color: $background-color-btn-hover;
     }
@@ -242,10 +252,10 @@ body {
 
 ///////////////////////////////////////////////////////////////////////
 .copyright {
-  margin-top: 9.6rem;
+  margin-top: 6.4rem;
   text-align: center;
   font-size: 1.6rem;
-  padding: 1.2rem 0;
+  padding: 3.6rem 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
