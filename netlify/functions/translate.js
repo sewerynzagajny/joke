@@ -1,6 +1,6 @@
-const fetch = require("node-fetch");
+import fetch from "node-fetch";
 
-exports.handler = async (event) => {
+export async function handler(event) {
   const { text } = JSON.parse(event.body);
 
   const apiURL = "https://api-free.deepl.com/v2/translate";
@@ -38,4 +38,4 @@ exports.handler = async (event) => {
       body: JSON.stringify({ error: error.message }),
     };
   }
-};
+}
