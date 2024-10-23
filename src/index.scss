@@ -62,6 +62,16 @@ $color-black: #000;
   }
 }
 
+@keyframes rotate {
+  0% {
+    transform: rotate(0);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 ///Querias
 
 ///////////////////////////////////////////////////////////////////
@@ -195,4 +205,17 @@ body {
   text-align: center;
   font-size: 1.6rem;
   padding: 1.2rem 0;
+}
+
+////////////////////////////////////////////////////////////////////////
+.spinner {
+  margin: -1.2rem auto;
+  text-align: center;
+
+  svg {
+    height: 6rem;
+    width: 6rem;
+    fill: $font-color-secondary;
+    animation: rotate 2s infinite linear;
+  }
 }

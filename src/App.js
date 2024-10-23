@@ -83,9 +83,9 @@ async function AJAX(
   }
 }
 
-function Button({ onClick, children }) {
+function Button({ onClick, children, disabled }) {
   return (
-    <button className="btn" onClick={onClick}>
+    <button className="btn" onClick={onClick} disabled={disabled}>
       <span className="btn__text">{children}</span>
     </button>
   );
@@ -94,7 +94,7 @@ function Button({ onClick, children }) {
 export default function App() {
   const [select, setSelect] = useState(() => {
     const savedSelect = localStorage.getItem("select");
-    return savedSelect ? savedSelect : "pl"; // Fallback na "pl"
+    return savedSelect ? savedSelect : "pl";
   });
 
   const [joke, setJoke] = useState(() => {
@@ -113,6 +113,8 @@ export default function App() {
     const savedTranslations = localStorage.getItem("translatedJokes");
     return savedTranslations ? JSON.parse(savedTranslations) : {};
   });
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("select", select);
@@ -152,16 +154,27 @@ export default function App() {
     }
   }
 
-  checkDate();
+  useEffect(() => {
+    checkDate();
+  }, []);
 
   function handleGetJoke() {
     getJokeFromAPI();
     // getTranslationFromAPI();
   }
 
+  function isTranslationExpired(savedDate) {
+    const currentDate = new Date();
+    const translationDate = new Date(savedDate);
+
+    const diffInDays = (currentDate - translationDate) / (1000 * 60 * 60 * 24);
+    return diffInDays > 30;
+  }
+
   async function getJokeFromAPI() {
     const apiURL = "https://v2.jokeapi.dev/joke/Any";
     try {
+      setLoading(true);
       if (idCounter >= 10 && idCounter < 15) {
         setIdCounter((prev) => prev + 1);
         setJoke(limitMessages[idCounter - 10]);
@@ -191,6 +204,8 @@ export default function App() {
     } catch (err) {
       console.error(`${err} ❌❌❌`);
       throw err;
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -206,14 +221,19 @@ export default function App() {
         target_lang: "PL",
       };
       try {
+        setLoading(true);
         const data = await AJAX(apiURL, payload, apiName, apiKey);
         console.log("Translation response:", data);
         const translateText = data.translations[0].text;
+        const currentDate = new Date().toISOString();
 
-        setTranslatedJokes((prev) => ({
-          ...prev,
-          [jokeText]: translateText,
-        }));
+        const newTranslatedJokes = {
+          ...translatedJokes,
+          [jokeText]: { text: translateText, date: currentDate },
+        };
+
+        setTranslatedJokes(newTranslatedJokes);
+
         setJoke((prevJoke) => ({
           ...prevJoke,
           jokeTextPl: translateText,
@@ -221,14 +241,13 @@ export default function App() {
 
         localStorage.setItem(
           "translatedJokes",
-          JSON.stringify({
-            ...translatedJokes,
-            [jokeText]: translateText,
-          })
+          JSON.stringify(newTranslatedJokes)
         );
       } catch (err) {
         console.error(`${err} ❌❌❌`);
         throw err;
+      } finally {
+        setLoading(false);
       }
     },
     [translatedJokes]
@@ -253,15 +272,38 @@ export default function App() {
     getTranslationFromAPI,
   ]);
 
+  useEffect(() => {
+    const savedTranslation = localStorage.getItem("translatedJokes");
+
+    if (savedTranslation) {
+      const parsedTranslations = JSON.parse(savedTranslation);
+      const filteredTranslations = {};
+
+      for (const joke in parsedTranslations) {
+        if (!isTranslationExpired(parsedTranslations[joke].date)) {
+          filteredTranslations[joke] = parsedTranslations[joke];
+        }
+      }
+
+      setTranslatedJokes(filteredTranslations);
+
+      localStorage.setItem(
+        "translatedJokes",
+        JSON.stringify(filteredTranslations)
+      );
+    }
+  }, []);
+
   return (
     <div className="app">
       <Logo select={select} />
-      <JokingText joke={joke} select={select} />
+      <JokingText joke={joke} select={select} loading={loading} />
       <Cta
         select={select}
         setSelect={setSelect}
         onGetJoke={handleGetJoke}
         idCounter={idCounter}
+        loading={loading}
       />
       <Footer />
     </div>
@@ -279,20 +321,24 @@ function Logo({ select }) {
   );
 }
 
-function JokingText({ joke, select }) {
+function JokingText({ joke, select, loading }) {
   return (
     <div className="joking-text">
       <div key={joke.id} className="joke">
-        <p>{select === "pl" ? joke.jokeTextPl : joke.jokeTextEn}</p>
+        {loading ? (
+          <Spinner />
+        ) : (
+          <p>{select === "pl" ? joke.jokeTextPl : joke.jokeTextEn}</p>
+        )}
       </div>
     </div>
   );
 }
 
-function Cta({ select, setSelect, onGetJoke, idCounter }) {
+function Cta({ select, setSelect, onGetJoke, idCounter, loading }) {
   return (
     <div className="cta">
-      <Button onClick={onGetJoke}>
+      <Button onClick={onGetJoke} disabled={loading}>
         {select === "pl" ? "Żart" : "Joke"}{" "}
         {(idCounter > 0 && idCounter <= 10 && `(${10 - idCounter})`) ||
           (idCounter > 10 && `(${0})`)}
@@ -326,5 +372,15 @@ function Footer() {
         All rights reserved.
       </p>
     </footer>
+  );
+}
+
+function Spinner() {
+  return (
+    <div className="spinner">
+      <svg width="24" height="24">
+        <use href="/icons.svg#icon-loader" />
+      </svg>
+    </div>
   );
 }
