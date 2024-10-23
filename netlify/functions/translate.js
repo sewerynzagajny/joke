@@ -1,14 +1,37 @@
 export async function handler(event) {
-  const { text } = JSON.parse(event.body);
+  let text;
+
+  try {
+    if (!event.body) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing request body" }),
+      };
+    }
+
+    const body = JSON.parse(event.body);
+    text = body.text;
+
+    if (!text) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Text to translate is required" }),
+      };
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Invalid JSON format" }),
+    };
+  }
 
   const apiURL = "https://api-free.deepl.com/v2/translate";
-  const apiKey = process.env.DEEPL_API_KEY; // Zmienna środowiskowa
+  const apiKey = process.env.DEEPL_API_KEY;
 
-  // Używamy dynamicznego importu dla node-fetch
   const fetch = (await import("node-fetch")).default;
 
   const payload = {
-    text: [text],
+    text: text,
     source_lang: "EN",
     target_lang: "PL",
   };
@@ -26,7 +49,7 @@ export async function handler(event) {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(`Błąd: ${response.status}`);
+      throw new Error(`Błąd: ${data.message || response.status}`);
     }
 
     return {

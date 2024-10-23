@@ -213,7 +213,7 @@ export default function App() {
     async (jokeText) => {
       const apiURL = "/.netlify/functions/translate";
       const payload = {
-        text: [jokeText],
+        text: jokeText,
       };
       try {
         setLoading(true);
