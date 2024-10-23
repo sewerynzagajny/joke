@@ -152,17 +152,23 @@ body {
 
   &:hover {
     background-color: $background-color-btn-hover;
+
+    @media (hover: none) and (pointer: coarse) {
+      background-color: inherit;
+    }
   }
 
   &:hover &__text {
     transform: scaleX(-1);
+    @media (hover: none) and (pointer: coarse) {
+      transform: none;
+    }
   }
 
-  // &:active {
-  //   background-color: $background-color-btn-hover;
-  //   box-shadow: 0 0.5rem 1rem rgba($color-black, 0.2);
-  //   transform: translateY(0.25rem);
-  // }
+  &:active {
+    box-shadow: 0 0.5rem 1rem rgba($color-black, 0.2);
+    transform: translateY(0.25rem);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -252,9 +258,4 @@ body {
     fill: $font-color-secondary;
     animation: rotate 2s infinite linear;
   }
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-///
-.active {
 }
