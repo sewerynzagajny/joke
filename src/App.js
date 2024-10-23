@@ -211,19 +211,13 @@ export default function App() {
 
   const getTranslationFromAPI = useCallback(
     async (jokeText) => {
-      const apiURL =
-        "https://cors-anywhere.herokuapp.com/https://api-free.deepl.com/v2/translate";
-      const apiKey = "5d248dcc-0af5-4df1-9f03-afbd7e480113:fx";
-      const apiName = "DeepL-Auth-Key";
+      const apiURL = "/.netlify/functions/translate";
       const payload = {
         text: [jokeText],
-        source_lang: "EN",
-        target_lang: "PL",
       };
       try {
         setLoading(true);
-        const data = await AJAX(apiURL, payload, apiName, apiKey);
-        console.log("Translation response:", data);
+        const data = await AJAX(apiURL, payload);
         const translateText = data.translations[0].text;
         const currentDate = new Date().toISOString();
 
