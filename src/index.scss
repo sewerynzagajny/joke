@@ -140,7 +140,6 @@ body {
 ///
 .btn {
   @extend %common-input-styles;
-  background-color: $background-color-btn;
 
   padding: 0.8rem 0;
   height: 4.2rem;
@@ -159,15 +158,10 @@ body {
     transform: scaleX(-1);
   }
 
-  &:active {
-    // background-color: $background-color-btn-hover;
-    box-shadow: 0 0.5rem 1rem rgba($color-black, 0.2);
-    transform: translateY(0.25rem);
-  }
-
-  // &:not(:hover):not(:active) &__text {
-  //   transform: scaleX(1);
-  //   background-color: $background-color-btn;
+  // &:active {
+  //   background-color: $background-color-btn-hover;
+  //   box-shadow: 0 0.5rem 1rem rgba($color-black, 0.2);
+  //   transform: translateY(0.25rem);
   // }
 }
 
@@ -236,10 +230,6 @@ body {
     &:active {
       background-color: $background-color-btn-hover;
     }
-
-    &:not(:hover):not(:active) {
-      background-color: $background-color-btn;
-    }
   }
 }
 
@@ -262,4 +252,9 @@ body {
     fill: $font-color-secondary;
     animation: rotate 2s infinite linear;
   }
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+///
+.active {
 }
