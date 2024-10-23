@@ -1,29 +1,5 @@
 export async function handler(event) {
-  let text;
-
-  try {
-    if (!event.body) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Missing request body" }),
-      };
-    }
-
-    const body = JSON.parse(event.body);
-    text = body.text;
-
-    if (!text) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Text to translate is required" }),
-      };
-    }
-  } catch (error) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Invalid JSON format" }),
-    };
-  }
+  const { text } = JSON.parse(event.body);
 
   const apiURL = "https://api-free.deepl.com/v2/translate";
   const apiKey = process.env.DEEPL_API_KEY;
@@ -49,7 +25,7 @@ export async function handler(event) {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(`Błąd: ${data.message || response.status}`);
+      throw new Error(`Błąd: ${response.status}`);
     }
 
     return {
