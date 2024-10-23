@@ -4,7 +4,7 @@ exports.handler = async (event) => {
   const { text } = JSON.parse(event.body);
 
   const apiURL = "https://api-free.deepl.com/v2/translate";
-  const apiKey = "5d248dcc-0af5-4df1-9f03-afbd7e480113:fx";
+  const apiKey = process.env.DEEPL_API_KEY;
 
   const payload = {
     text: [text],
