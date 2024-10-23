@@ -159,7 +159,6 @@ body {
   }
 
   &:active {
-    background-color: $background-color-btn-hover;
     box-shadow: 0 0.5rem 1rem rgba($color-black, 0.2);
     transform: translateY(0.25rem);
   }
@@ -226,8 +225,7 @@ body {
 
     padding: 0.8rem 1.6rem;
 
-    &:hover,
-    &:active {
+    &:hover {
       background-color: $background-color-btn-hover;
     }
   }
