@@ -1,10 +1,11 @@
-import fetch from "node-fetch";
-
 export async function handler(event) {
   const { text } = JSON.parse(event.body);
 
   const apiURL = "https://api-free.deepl.com/v2/translate";
-  const apiKey = process.env.DEEPL_API_KEY;
+  const apiKey = process.env.DEEPL_API_KEY; // Zmienna środowiskowa
+
+  // Używamy dynamicznego importu dla node-fetch
+  const fetch = (await import("node-fetch")).default;
 
   const payload = {
     text: [text],
