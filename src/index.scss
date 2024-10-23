@@ -154,7 +154,7 @@ body {
     background-color: $background-color-btn-hover;
 
     @media (hover: none) and (pointer: coarse) {
-      background-color: inherit;
+      background-color: $background-color-btn;
     }
   }
 
