@@ -320,7 +320,7 @@ function JokingText({ joke, select, loading }) {
     const jokeTextSplit = jokeText.split("? ");
     return jokeTextSplit.map((el, i) => (
       <p className="joking-text__text" key={i}>
-        {el === 0 ? el + "?" : el}
+        {i === 0 ? el + "?" : el}
       </p>
     ));
   }
