@@ -316,17 +316,26 @@ function Logo({ select }) {
 }
 
 function JokingText({ joke, select, loading }) {
+  function TwoPart(jokeText) {
+    const textQ = jokeText.replace("?", "??");
+    const jokeTextSplit = textQ.split("? ");
+    return jokeTextSplit.map((el, i) => (
+      <p className="joking-text__text" key={i}>
+        {el}
+      </p>
+    ));
+  }
+
   return (
     <div className="joking-text">
       <div key={joke.id} className="joke">
         {loading ? (
           <Spinner />
+        ) : select === "pl" ? (
+          TwoPart(joke.jokeTextPl)
         ) : (
-          <p className="joking-text__text">
-            {select === "pl" ? joke.jokeTextPl : joke.jokeTextEn}
-          </p>
+          TwoPart(joke.jokeTextEn)
         )}
-        <p className="joking-text__text"></p>
       </div>
     </div>
   );
