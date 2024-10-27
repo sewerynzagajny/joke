@@ -317,11 +317,10 @@ function Logo({ select }) {
 
 function JokingText({ joke, select, loading }) {
   function TwoPart(jokeText) {
-    const textQ = jokeText.replace("?", "??");
-    const jokeTextSplit = textQ.split("? ");
+    const jokeTextSplit = jokeText.split("? ");
     return jokeTextSplit.map((el, i) => (
       <p className="joking-text__text" key={i}>
-        {el}
+        {el === 0 ? el + "?" : el}
       </p>
     ));
   }
